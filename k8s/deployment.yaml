@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rag-app
+  labels:
+    app: enterprise-rag-platform
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: enterprise-rag-platform
+  template:
+    metadata:
+      labels:
+        app: enterprise-rag-platform
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+        - name: app
+          image: ghcr.io/dataeclipse/enterprise-rag-platform:latest
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: rag-config
+            - secretRef:
+                name: rag-secrets
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: "2"
+              memory: 4Gi
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rag-worker
+  labels:
+    app: enterprise-rag-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: enterprise-rag-worker
+  template:
+    metadata:
+      labels:
+        app: enterprise-rag-worker
+    spec:
+      containers:
+        - name: worker
+          image: ghcr.io/dataeclipse/enterprise-rag-platform:latest
+          command: ["python", "-m", "rag.worker"]
+          envFrom:
+            - configMapRef:
+                name: rag-config
+            - secretRef:
+                name: rag-secrets
+          resources:
+            requests:
+              cpu: 250m
+              memory: 1Gi
+            limits:
+              cpu: "1"
+              memory: 2Gi
