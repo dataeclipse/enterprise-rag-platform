@@ -1,4 +1,4 @@
-from collections.abc import AsyncIterator, Sequence
+﻿from collections.abc import AsyncIterator, Sequence
 
 import pytest
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
@@ -58,7 +58,9 @@ async def pipeline() -> AsyncIterator[IngestionPipeline]:
 
 
 async def test_ingest_indexes_document(pipeline: IngestionPipeline) -> None:
-    meta = await pipeline.ingest("policy.txt", DOCUMENT_TEXT.encode())
+    result = await pipeline.ingest("policy.txt", DOCUMENT_TEXT.encode())
+    meta = result.document
+    assert not result.deduplicated
     assert meta.status is DocumentStatus.INDEXED
     assert meta.version == 1
     stored = await pipeline._repository.get_by_id(meta.id)
@@ -71,22 +73,24 @@ async def test_ingest_indexes_document(pipeline: IngestionPipeline) -> None:
 
 
 async def test_ingest_exact_duplicate_returns_existing(pipeline: IngestionPipeline) -> None:
-    first = await pipeline.ingest("policy.txt", DOCUMENT_TEXT.encode())
+    first = (await pipeline.ingest("policy.txt", DOCUMENT_TEXT.encode())).document
     second = await pipeline.ingest("copy.txt", DOCUMENT_TEXT.encode())
-    assert second.id == first.id
+    assert second.document.id == first.id
+    assert second.deduplicated
     assert len(await pipeline._repository.list_documents()) == 1
 
 
 async def test_ingest_near_duplicate_skipped(pipeline: IngestionPipeline) -> None:
-    first = await pipeline.ingest("policy.txt", DOCUMENT_TEXT.encode())
+    first = (await pipeline.ingest("policy.txt", DOCUMENT_TEXT.encode())).document
     near = DOCUMENT_TEXT.replace("direct manager", "line manager")
     second = await pipeline.ingest("other.txt", near.encode())
-    assert second.id == first.id
+    assert second.document.id == first.id
+    assert second.deduplicated
 
 
 async def test_ingest_new_version_supersedes(pipeline: IngestionPipeline) -> None:
-    first = await pipeline.ingest("policy.txt", DOCUMENT_TEXT.encode())
-    second = await pipeline.ingest("policy.txt", REVISED_TEXT.encode())
+    first = (await pipeline.ingest("policy.txt", DOCUMENT_TEXT.encode())).document
+    second = (await pipeline.ingest("policy.txt", REVISED_TEXT.encode())).document
     assert second.version == 2
     old = await pipeline._repository.get_by_id(first.id)
     assert old is not None
@@ -98,8 +102,8 @@ async def test_ingest_new_version_supersedes(pipeline: IngestionPipeline) -> Non
 
 
 async def test_ingest_unrelated_documents_coexist(pipeline: IngestionPipeline) -> None:
-    first = await pipeline.ingest("policy.txt", DOCUMENT_TEXT.encode())
-    second = await pipeline.ingest("security.txt", UNRELATED_TEXT.encode())
+    first = (await pipeline.ingest("policy.txt", DOCUMENT_TEXT.encode())).document
+    second = (await pipeline.ingest("security.txt", UNRELATED_TEXT.encode())).document
     assert first.id != second.id
     assert len(await pipeline._repository.list_documents()) == 2
 

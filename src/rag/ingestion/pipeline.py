@@ -1,5 +1,7 @@
 from uuid import UUID
 
+from pydantic import BaseModel
+
 from rag.ingestion.chunkers import Chunker
 from rag.ingestion.dedup import DeduplicationIndex, MinHasher, content_hash
 from rag.ingestion.embedders import Embedder
@@ -12,6 +14,11 @@ from rag.retrieval.sparse import BM25Index
 from rag.retrieval.vector_store import VectorStore
 
 logger = get_logger(__name__)
+
+
+class IngestResult(BaseModel):
+    document: DocumentMeta
+    deduplicated: bool = False
 
 
 class IngestionPipeline:
@@ -42,7 +49,7 @@ class IngestionPipeline:
         self._bm25_index.rebuild(await self._repository.all_chunks())
         self._warmed = True
 
-    async def ingest(self, filename: str, data: bytes, source: str | None = None) -> DocumentMeta:
+    async def ingest(self, filename: str, data: bytes, source: str | None = None) -> IngestResult:
         if not self._warmed:
             await self.warm_up()
         source_name = source or filename
@@ -55,14 +62,14 @@ class IngestionPipeline:
         if exact is not None:
             self._count("duplicate")
             logger.info("ingest_duplicate", source=source_name, existing=str(exact.id))
-            return exact
+            return IngestResult(document=exact, deduplicated=True)
         near_key = self._dedup_index.find_duplicate(text)
         if near_key is not None:
             existing = await self._repository.get_by_id(UUID(near_key))
             if existing is not None:
                 self._count("near_duplicate")
                 logger.info("ingest_near_duplicate", source=source_name, existing=str(existing.id))
-                return existing
+                return IngestResult(document=existing, deduplicated=True)
 
         previous = await self._repository.latest_for_source(source_name)
         meta = DocumentMeta(
@@ -99,7 +106,10 @@ class IngestionPipeline:
             version=meta.version,
             chunks=len(chunks),
         )
-        return meta.model_copy(update={"status": DocumentStatus.INDEXED})
+        return IngestResult(
+            document=meta.model_copy(update={"status": DocumentStatus.INDEXED}),
+            deduplicated=False,
+        )
 
     async def delete_document(self, meta: DocumentMeta) -> None:
         await self._vector_store.delete_document(meta.id)
