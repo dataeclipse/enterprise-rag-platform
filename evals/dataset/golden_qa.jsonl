@@ -1,0 +1,15 @@
+{"question": "How many days of paid annual leave do full-time employees get?", "answer": "Full-time employees receive 25 days of paid annual leave per calendar year.", "source": "hr-handbook.md"}
+{"question": "How many unused vacation days can be carried over to the next year?", "answer": "Up to 5 unused days can be carried over, and they expire on March 31 of the following year.", "source": "hr-handbook.md"}
+{"question": "How many days per week can employees work remotely?", "answer": "Employees may work remotely up to three days per week after probation.", "source": "hr-handbook.md"}
+{"question": "When is a medical certificate required for sick leave?", "answer": "A medical certificate is required after the third consecutive day of absence.", "source": "hr-handbook.md"}
+{"question": "How long is parental leave for primary caregivers?", "answer": "Primary caregivers receive 16 weeks of fully paid parental leave.", "source": "hr-handbook.md"}
+{"question": "What are the password requirements?", "answer": "Passwords must be at least 14 characters and rotate every 180 days.", "source": "security-policy.md"}
+{"question": "How often do VPN client certificates rotate?", "answer": "VPN client certificates rotate every 90 days automatically.", "source": "security-policy.md"}
+{"question": "How quickly must a suspected security incident be reported?", "answer": "Incidents must be reported to the security operations center within one hour of discovery.", "source": "security-policy.md"}
+{"question": "What data classification tiers exist?", "answer": "Data is classified into public, internal, confidential and restricted tiers.", "source": "security-policy.md"}
+{"question": "What is the deadline for submitting expense reports?", "answer": "Expense reports must be submitted within 30 days of the purchase date; reports after 60 days are rejected.", "source": "expense-policy.md"}
+{"question": "When are receipts mandatory for expenses?", "answer": "Receipts are mandatory for any expense above 50 dollars.", "source": "expense-policy.md"}
+{"question": "What is the domestic per diem rate?", "answer": "The domestic per diem rate is 65 dollars per day covering meals and incidentals.", "source": "expense-policy.md"}
+{"question": "When is business class allowed for flights?", "answer": "Business class is allowed for flights longer than six hours with director approval.", "source": "expense-policy.md"}
+{"question": "Who gets a corporate credit card?", "answer": "Employees who travel more than four times per year are issued corporate credit cards.", "source": "expense-policy.md"}
+{"question": "What happens on the second personal use violation of a corporate card?", "answer": "The corporate card is revoked on the second violation.", "source": "expense-policy.md"}

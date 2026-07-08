@@ -70,7 +70,7 @@ packages = ["src/rag"]
 [tool.ruff]
 line-length = 100
 target-version = "py312"
-src = ["src", "tests"]
+src = ["src", "tests", "evals"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "N", "UP", "B", "C4", "SIM", "RUF", "ASYNC", "S", "PTH"]
@@ -79,6 +79,7 @@ ignore = ["S101"]
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["S105", "S106", "ASYNC"]
 "src/rag/ingestion/dedup.py" = ["S311"]
+"evals/**" = ["E402"]
 
 [tool.black]
 line-length = 100
