@@ -76,6 +76,7 @@ ignore = ["S101"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["S105", "S106", "ASYNC"]
+"src/rag/ingestion/dedup.py" = ["S311"]
 
 [tool.black]
 line-length = 100
