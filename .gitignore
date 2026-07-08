@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+
+# Tooling caches
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Environments / secrets
+.env
+.env.*
+!.env.example
+
+# ML artifacts
+models/
+*.safetensors
+*.bin
+*.gguf
+*.onnx
+data/
+!evals/dataset/
+
+# Local storage
+qdrant_storage/
+pg_data/
+*.db
+*.sqlite
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Assistant / planning
+CLAUDE.md
+.claude/

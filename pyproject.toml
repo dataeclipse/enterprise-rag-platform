@@ -1,0 +1,109 @@
+[project]
+name = "enterprise-rag-platform"
+version = "0.1.0"
+description = "Multi-agent RAG platform for enterprise document search with hybrid retrieval, guardrails and observability"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "dataeclipse" }]
+dependencies = [
+    "pydantic>=2.11",
+    "pydantic-settings>=2.10",
+    "structlog>=25.4",
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.35",
+    "sse-starlette>=2.3",
+    "pyjwt>=2.10",
+    "httpx>=0.28",
+    "openai>=1.90",
+    "langgraph>=1.0",
+    "langchain-core>=1.0",
+    "langchain-text-splitters>=1.0",
+    "qdrant-client>=1.14",
+    "redis>=6.2",
+    "sqlalchemy[asyncio]>=2.0.41",
+    "asyncpg>=0.30",
+    "aio-pika>=9.5",
+    "rank-bm25>=0.2.2",
+    "tenacity>=9.1",
+    "prometheus-client>=0.22",
+    "opentelemetry-api>=1.34",
+    "opentelemetry-sdk>=1.34",
+    "pypdf>=5.6",
+    "python-docx>=1.2",
+    "beautifulsoup4>=4.13",
+    "markdown-it-py>=3.0",
+]
+
+[project.optional-dependencies]
+ml = [
+    "sentence-transformers>=5.0",
+]
+evals = [
+    "ragas>=0.2.15",
+    "datasets>=3.6",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4",
+    "pytest-asyncio>=1.0",
+    "pytest-cov>=6.2",
+    "ruff>=0.12",
+    "black>=25.1",
+    "mypy>=1.16",
+    "pre-commit>=4.2",
+    "httpx>=0.28",
+    "types-beautifulsoup4>=4.12",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/rag"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "C4", "SIM", "RUF", "ASYNC", "S", "PTH"]
+ignore = ["S101"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S105", "S106", "ASYNC"]
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+[tool.mypy]
+strict = true
+python_version = "3.11"
+mypy_path = "src"
+packages = ["rag"]
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = [
+    "rank_bm25.*",
+    "sentence_transformers.*",
+    "aio_pika.*",
+    "ragas.*",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = "-q --strict-markers"
+markers = [
+    "integration: requires running docker services",
+]
+
+[tool.coverage.run]
+source = ["src/rag"]
+omit = ["src/rag/api/main.py"]
