@@ -1,5 +1,4 @@
 import logging
-import sys
 from typing import cast
 
 import structlog
@@ -23,8 +22,8 @@ def configure_logging(level: str = "INFO", json_output: bool = True) -> None:
         wrapper_class=structlog.make_filtering_bound_logger(
             logging.getLevelNamesMapping()[level.upper()]
         ),
-        logger_factory=structlog.PrintLoggerFactory(sys.stdout),
-        cache_logger_on_first_use=True,
+        logger_factory=structlog.PrintLoggerFactory(),
+        cache_logger_on_first_use=False,
     )
 
 
